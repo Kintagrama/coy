@@ -63,16 +63,6 @@ def analyze_image():
             "error": f"Error en el análisis: {str(e)}"
         }), 500
 
-# Ruta para servir el frontend
-@app.route('/')
-def serve_frontend():
-    return send_from_directory('../frontend', 'index.html')
-
-# Ruta para archivos estáticos (JS/CSS)
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('../frontend', path)
-
 # Health check
 @app.route('/health')
 def health_check():
