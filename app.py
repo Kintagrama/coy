@@ -7,8 +7,12 @@ import io
 import os
 
 # Configuración inicial
-app = Flask(__name__, static_folder='frontend', static_url_path='')
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)  # Habilita CORS para todas las rutas
+
+@app.route('/')
+def serve_frontend():
+    return send_from_directory('.', 'index.html')
 
 # Carga del modelo (solo una vez al iniciar)
 MODEL_NAME = "tuphamdf/skincare-detection"
