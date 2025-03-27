@@ -1,11 +1,4 @@
-const skinTypeTranslations = {
-    'oily': 'piel grasa',
-    'dry': 'piel eca',
-    'combination': 'piel mixta',
-    'normal': 'piel normal',
-    'acne': 'acné',
-    'rosacea': 'rosácea'
-};
+
 
 document.getElementById('input').addEventListener('change', async (event) => {
     const file = event.target.files[0];
@@ -35,22 +28,20 @@ chatFrame.innerHTML = `
     <div style="color:white; font-family: Arial, sans-serif;">
         <h2 style="color: #FFC42B;">🔍 Resultado del Análisis</h2>
         <p style="font-size: 18px; margin-bottom: 20px;">
-            Se ha detectado piel <strong>"${skinTypeTranslations[result.predictions[0].label.toLowerCase()] || result.predictions[0].label}"</strong>
+            Se ha detectado: <strong>"${result.predictions[0].label}"</strong>
         </p>
         <div style="background: #2A2A2A; padding: 15px; border-radius: 8px;">
             <h3 style="margin-top: 0;">Detalles:</h3>
             <ul style="list-style-type: none; padding-left: 0;">
-                ${result.predictions.map(pred => {
-                    const translatedLabel = skinTypeTranslations[pred.label.toLowerCase()] || pred.label;
-                    return `
+                ${result.predictions.map(pred => `
                     <li style="margin-bottom: 8px;">
-                        ▸ ${translatedLabel}: <span style="color: #4CAF50;">${pred.confidence}</span>
-                    </li>`;
-                }).join('')}
+                        ▸ ${pred.label}: <span style="color: #4CAF50;">${pred.confidence}</span>
+                    </li>
+                `).join('')}
             </ul>
         </div>
     </div>
-
+`;
     } catch (error) {
         chatFrame.innerHTML = `<div style="color:red">Error: ${error.message}</div>`;
     }
