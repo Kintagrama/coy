@@ -23,14 +23,15 @@ document.getElementById('input').addEventListener('change', async (event) => {
 
         // 4. Mostrar resultados en tu HTML
         chatFrame.innerHTML = `
-            <div style="color:white">
-                <h3>Diagnóstico: ${result.diagnosis}</h3>
-                <p>Precisión: ${(result.confidence * 100).toFixed(1)}%</p>
-                <ul>
-                    ${result.treatment.map(t => `<li>${t}</li>`).join('')}
-                </ul>
-            </div>
-        `;
+    <div style="color:white">
+        <h3>Resultados:</h3>
+        <ul>
+            ${result.predictions.map(pred => `
+                <li>${pred.label} (${pred.confidence})</li>
+            `).join('')}
+        </ul>
+    </div>
+`;
 
     } catch (error) {
         chatFrame.innerHTML = `<div style="color:red">Error: ${error.message}</div>`;
