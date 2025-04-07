@@ -7,7 +7,10 @@ import io
 
 # Configuración de la aplicación Flask
 app = Flask(__name__, static_folder='static', static_url_path='')
-CORS(app)  # Habilita CORS para todas las rutas
+CORS(app, resources={
+    r"/api/*": {"origins": "*"},
+    r"/health": {"origins": "*"}
+})
 
 # Configuración del modelo
 MODEL_NAME = "tuphamdf/skincare-detection"
@@ -43,7 +46,7 @@ def serve_index():
 def analyze_image():
     try:
         if 'image' not in request.files:
-            return jsonify({"success": False, "error": "No se subió ninguna imagen"}), 400
+            return jsonify({"success": False, "error": "No image uploaded"}), 400
         
         image_file = request.files['image']
         image = Image.open(io.BytesIO(image_file.read())).convert("RGB")
@@ -53,14 +56,16 @@ def analyze_image():
             outputs = model(**inputs)
         
         probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-        top_prob, top_label = torch.max(probs, dim=-1)
+        top_probs, top_labels = torch.topk(probs, 3)  # Obtener top 3 resultados
         
-        # Formatear respuesta más simple para el frontend
+        predictions = [{
+            "label": model.config.id2label[top_labels[0][i].item()],
+            "confidence": f"{(top_probs[0][i].item() * 100):.1f}%"
+        } for i in range(3)]
+        
         return jsonify({
             "success": True,
-            "diagnosis": model.config.id2label[top_label.item()],
-            "confidence": float(top_prob.item()),
-            "score": float(top_prob.item())
+            "predictions": predictions
         })
         
     except Exception as e:
