@@ -18,11 +18,14 @@ init_contexts = [torch.no_grad()]  # Versión simplificada pero funcional
 
 # Carga del modelo (solo una vez al iniciar)
 MODEL_NAME = "tuphamdf/skincare-detection"
-print("⏳ Cargando modelo de IA...")
-model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
-feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
+print("⏳ Cargando modelo...")
+model = AutoModelForImageClassification.from_pretrained(
+    "tuphamdf/skincare-detection",
+    low_cpu_mem_usage=True,  # Reemplaza la necesidad de no_init_weights
+    device_map="auto"        # Optimiza para la hardware disponible
+)
 model.eval()
-print("✅ Modelo cargado correctamente")
+print("✅ Modelo cargado")
 
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
