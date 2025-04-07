@@ -34,7 +34,7 @@ except Exception as e:
 # Ruta para servir el frontend
 @app.route('/')
 def serve_index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('index.html')
 
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
