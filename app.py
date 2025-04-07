@@ -14,7 +14,6 @@ try:
     device_map=None,          # No usar auto device mapping
     torch_dtype=torch.float32
 )
-    model.eval()
     print("✅ Modelo cargado correctamente")
 except Exception as e:
     print(f"❌ Error cargando modelo: {str(e)}")
