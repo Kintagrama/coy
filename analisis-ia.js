@@ -33,9 +33,9 @@ chatFrame.innerHTML = `
         <div style="background: #2A2A2A; padding: 15px; border-radius: 8px;">
             <h3 style="margin-top: 0;">Detalles:</h3>
             <ul style="list-style-type: none; padding-left: 0;">
-                ${result.predictions.map(pred => `
+                               ${result.predictions.slice(1).map(pred => `
                     <li style="margin-bottom: 8px;">
-                        ▸ ${pred.label}: <span style="color: #4CAF50;">${pred.confidence}</span>
+                        ▸ ${pred.label}: ${pred.confidence}
                     </li>
                 `).join('')}
             </ul>
