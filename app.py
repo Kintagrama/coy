@@ -4,7 +4,7 @@ from transformers import AutoModelForImageClassification, AutoFeatureExtractor
 import torch
 
 # Configuración del modelo
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
@@ -29,6 +29,11 @@ except Exception as e:
     feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
     model.eval()
     print("✅ Modelo cargado (modo básico)")
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('static', 'index.html')
+    
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
 def analyze_image():
