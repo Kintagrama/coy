@@ -6,7 +6,7 @@ import torch
 import io
 
 # Configuración de la aplicación Flask
-app = Flask(__name__, static_folder='static', static_url_path='')
+app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {"origins": "*"},
     r"/health": {"origins": "*"}
@@ -79,6 +79,9 @@ def health_check():
         "model": MODEL_NAME,
         "loaded": model is not None
     })
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
