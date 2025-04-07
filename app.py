@@ -3,24 +3,31 @@ from flask_cors import CORS
 from transformers import AutoModelForImageClassification, AutoFeatureExtractor
 import torch
 
-# Configuración optimizada para Render
+# Configuración del modelo
 MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
 try:
- model = AutoModelForImageClassification.from_pretrained(
-    MODEL_NAME,
-    low_cpu_mem_usage=False,  # Desactiva esta opción
-    device_map=None,          # No usar auto device mapping
-    torch_dtype=torch.float32
-)
+    # Intenta cargar con configuraciones óptimas
+    model = AutoModelForImageClassification.from_pretrained(
+        MODEL_NAME,
+        low_cpu_mem_usage=False,  # Desactivado para evitar dependencia de accelerate
+        device_map=None,          # Desactivado mapeo automático
+        torch_dtype=torch.float32
+    )
+    feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
+    model.eval()
     print("✅ Modelo cargado correctamente")
+
 except Exception as e:
     print(f"❌ Error cargando modelo: {str(e)}")
-    # Fallback sin optimizaciones
+    print("Intentando carga básica...")
+    
+    # Fallback mínimo
     model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
+    feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
     model.eval()
-
+    print("✅ Modelo cargado (modo básico)")
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
 def analyze_image():
