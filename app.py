@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from transformers import AutoModelForImageClassification, AutoFeatureExtractor
 from PIL import Image
@@ -32,10 +32,12 @@ except Exception as e:
     print("✅ Modelo cargado (modo básico)")
 
 # Ruta para servir el frontend
+
+
 @app.route('/')
 def serve_index():
-    return send_from_directory('index.html')
-
+    return send_file('index.html')
+    
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
 def analyze_image():
