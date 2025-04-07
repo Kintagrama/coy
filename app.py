@@ -14,6 +14,8 @@ CORS(app)  # Habilita CORS para todas las rutas
 def serve_frontend():
     return send_from_directory('.', 'index.html')
 
+init_contexts = [no_init_weights(), torch.no_grad()]  # Reemplazo temporal
+
 # Carga del modelo (solo una vez al iniciar)
 MODEL_NAME = "tuphamdf/skincare-detection"
 print("⏳ Cargando modelo de IA...")
