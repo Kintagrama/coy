@@ -4,6 +4,7 @@ from transformers import AutoModelForImageClassification, AutoFeatureExtractor
 import torch
 
 # Configuración del modelo
+app = Flask(__name__)
 MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
