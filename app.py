@@ -1,86 +1,76 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from transformers import AutoModelForImageClassification, AutoFeatureExtractor
+from PIL import Image
 import torch
+import io
+
+# Configuración de la aplicación Flask
+app = Flask(__name__, static_folder='static', static_url_path='')
+CORS(app)  # Habilita CORS para todas las rutas
 
 # Configuración del modelo
-app = Flask(__name__, static_folder='static', static_url_path='')
 MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
 try:
-    # Intenta cargar con configuraciones óptimas
     model = AutoModelForImageClassification.from_pretrained(
         MODEL_NAME,
-        low_cpu_mem_usage=False,  # Desactivado para evitar dependencia de accelerate
-        device_map=None,          # Desactivado mapeo automático
+        low_cpu_mem_usage=False,
+        device_map=None,
         torch_dtype=torch.float32
     )
     feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
     model.eval()
     print("✅ Modelo cargado correctamente")
-
 except Exception as e:
     print(f"❌ Error cargando modelo: {str(e)}")
     print("Intentando carga básica...")
-    
-    # Fallback mínimo
     model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
     feature_extractor = AutoFeatureExtractor.from_pretrained(MODEL_NAME)
     model.eval()
     print("✅ Modelo cargado (modo básico)")
 
+# Ruta para servir el frontend
 @app.route('/')
 def serve_index():
     return send_from_directory('static', 'index.html')
-    
+
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
 def analyze_image():
     try:
-        # 1. Validar que se envió una imagen
         if 'image' not in request.files:
-            return jsonify({"error": "No se subió ninguna imagen"}), 400
+            return jsonify({"success": False, "error": "No se subió ninguna imagen"}), 400
         
-        # 2. Leer la imagen
         image_file = request.files['image']
-        
-        # 3. Convertir a formato PIL
         image = Image.open(io.BytesIO(image_file.read())).convert("RGB")
         
-        # 4. Preprocesar y predecir
         inputs = feature_extractor(images=image, return_tensors="pt")
         with torch.no_grad():
             outputs = model(**inputs)
         
-        # 5. Procesar resultados
         probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-        top_probs, top_labels = torch.topk(probs, 3)
+        top_prob, top_label = torch.max(probs, dim=-1)
         
-        # 6. Formatear respuesta
-        results = [{
-            "label": model.config.id2label[top_labels[0][i].item()],
-            "score": top_probs[0][i].item(),
-            "confidence": f"{(top_probs[0][i].item() * 100):.1f}%"
-        } for i in range(3)]
-        
+        # Formatear respuesta más simple para el frontend
         return jsonify({
             "success": True,
-            "predictions": results
+            "diagnosis": model.config.id2label[top_label.item()],
+            "confidence": float(top_prob.item()),
+            "score": float(top_prob.item())
         })
         
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Error en el análisis: {str(e)}"
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # Health check
 @app.route('/health')
 def health_check():
     return jsonify({
         "status": "healthy",
-        "model": MODEL_NAME
+        "model": MODEL_NAME,
+        "loaded": model is not None
     })
 
 if __name__ == '__main__':
