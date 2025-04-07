@@ -8,12 +8,12 @@ MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
 try:
-    model = AutoModelForImageClassification.from_pretrained(
-        MODEL_NAME,
-        low_cpu_mem_usage=True,
-        device_map="auto" if torch.cuda.is_available() else "cpu",
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
-    )
+ model = AutoModelForImageClassification.from_pretrained(
+    MODEL_NAME,
+    low_cpu_mem_usage=False,  # Desactiva esta opción
+    device_map=None,          # No usar auto device mapping
+    torch_dtype=torch.float32
+)
     model.eval()
     print("✅ Modelo cargado correctamente")
 except Exception as e:
