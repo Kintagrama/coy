@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from transformers import AutoModelForImageClassification, AutoFeatureExtractor
-from PIL import Image
+from transformers.utils import no_init_weights 
 import torch
+from PIL import Image
 import io
-import os
 
 # Configuración inicial
 app = Flask(__name__, static_folder='.', static_url_path='')
