@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from transformers import AutoModelForImageClassification, AutoFeatureExtractor
-from transformers import AutoModelForImageClassification, AutoFeatureExtractor
 import torch
 
 # Configuración optimizada para Render
@@ -9,26 +8,19 @@ MODEL_NAME = "tuphamdf/skincare-detection"
 
 print("⏳ Cargando modelo de IA...")
 try:
-    # Método moderno (transformers >= 4.30.0)
     model = AutoModelForImageClassification.from_pretrained(
         MODEL_NAME,
-        low_cpu_mem_usage=True,  # Reemplaza no_init_weights
-        device_map="auto",       # Optimización automática
-        torch_dtype=torch.float16 # Reduce uso de memoria (opcional)
+        low_cpu_mem_usage=True,
+        device_map="auto" if torch.cuda.is_available() else "cpu",
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
     )
     model.eval()
     print("✅ Modelo cargado correctamente")
 except Exception as e:
     print(f"❌ Error cargando modelo: {str(e)}")
-    # Fallback a CPU si hay problemas con GPU
-    model = AutoModelForImageClassification.from_pretrained(
-        MODEL_NAME,
-        device_map="cpu",
-        low_cpu_mem_usage=True
-    )
+    # Fallback sin optimizaciones
+    model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
     model.eval()
-
-
 
 # Ruta para análisis de imágenes
 @app.route('/api/analyze', methods=['POST'])
