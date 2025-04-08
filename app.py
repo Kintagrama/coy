@@ -6,6 +6,12 @@ import torch
 import io
 import os
 
+import os  # Add at top of file
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))  # Render sets PORT env var
+    app.run(host='0.0.0.0', port=port)  # Use dynamic port
+
 # Configuración inicial
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)  # Habilita CORS para todas las rutas
